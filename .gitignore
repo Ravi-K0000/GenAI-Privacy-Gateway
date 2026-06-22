@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated demo outputs
+quick-demo/output/
+
+# Optional: generated mappings
+quick-demo/mock-store/*.json
+
+# Optional: generated provenance bundles
+quick-demo/output/provenance_chain/*.zip
