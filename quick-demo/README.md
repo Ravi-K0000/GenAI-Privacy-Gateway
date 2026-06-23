@@ -16,7 +16,7 @@ The quick demo has no DB, Vault, Lambda, Ganache, or cloud dependencies. It uses
 - `rehydration/` - mock mapping-based rehydration.
 - `provenance/` - local provenance bundle and ledger handling.
 - `mock-store/` - generated mock mapping rows, replacing the DB mapping tables.
-- `sample-data/` - the same CSV and TXT samples used by the original demo.
+- `sample-data/` - the same CSV and TXT samples used by the original demo (CSV is for structured data, TXT is for unstructured data).
 - `output/` - generated anonymized files, mapping debug files, external processor results, rehydrated results, logs, and provenance bundles.
 - `requirements-demo.txt` - Python packages needed for the quick demo.
 - `run_demo.py` - single demo entrypoint.
