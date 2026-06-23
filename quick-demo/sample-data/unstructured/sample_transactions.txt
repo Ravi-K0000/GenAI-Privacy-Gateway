@@ -1,0 +1,55 @@
+Transaction Log - Confidential
+
+1. Customer John Doe (DOB: 1985-07-23) paid $1200 using credit card 4111-1111-1111-1234.
+   Contact: john.doe@gmail.com, Phone: +1-202-555-0147.
+
+2. Employee ID 827364 of Acme Corp transferred salary of INR 55,000 to account number 123456789012 (IFSC: SBIN0001234).
+
+3. Mr. Sharma visited AIIMS hospital for a follow-up checkup related to diabetes medication. 
+   The consultation fee was ₹500. 
+   (Note: no account numbers or card data here.)
+
+4. Passport number: M1234567 issued in India, used for verification at Sydney airport.
+
+5. The spouse of Raj Kumar works at TCS Bangalore HQ. 
+
+6. Travel booking ID: TRV987654 with Emirates, for trip to Dubai. 
+   Associated frequent flyer program used to accumulate miles. 
+   Paid via company travel desk.
+
+7. Residential address on file: 221B Baker Street, London, UK.
+
+8. Customer David Lee (DOB: 1982-11-30) paid $430 using debit card 5555-6666-7777-8888.
+   Contact: david.lee@yahoo.com, Phone: +1-415-555-0123.
+
+9. Employee ID 663728 of Zenith Corp transferred INR 62,000 to account number 345678901234 (IFSC: ICIC0004321).
+
+10. Mrs. Kavita Sharma visited Apollo hospital for diabetes consultation.
+    Consultation fee ₹650.
+
+11. Customer Jack Smith (DOB: 1990-05-22) paid $1800 using credit card 2333-3333-3333-2143.
+   Contact: jack.smith@gmail.com, Phone: +1-222-505-0142.
+
+12. Employee ID 428364 of Bosch limited moved amount of INR 59,000 to account number 122288889012 (IFSC: JYEN0004321).
+
+13. Mr. Smith visited Cambridge hospital for a follow-up related to cancer diagnosis. 
+   The consultation fee was 500 pounds. 
+
+14. Passport number: M974536436 issued in London, used for verification at Heathrow airport.
+
+15. The mother of Nancy Drew works at JP Morgan London HQ. 
+ 
+
+16. Travel booking ID: TRVL34554 with Ryanair, for trip to Florence. 
+   Associated frequent flyer program used to accumulate miles. 
+   Paid via company travel program.
+
+17. Residential address in the file: 23 Harley Street, London, UK.
+
+18. Customer Bruce Lee (DOB: 1967-10-30) paid $440 using debit card 4445-6695-7721-8218.
+   Contact: bruce.lee@yahoo.com, Phone: +1-422-534-0563.
+
+19. Employee ID 113338 of Ace Corp transferred INR 22,323 to account number 3429831234 (IFSC: ICIC0006781).
+
+20. Mrs. Cindy Shaw visited Fox consultants for ETF investment discussions.
+    Consultation fee 650 pounds.

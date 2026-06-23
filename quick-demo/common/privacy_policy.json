@@ -1,0 +1,58 @@
+{
+  "structured": {
+    "static_fields": [
+      {
+        "field": "First Name",
+        "label": "FIRSTNAME"
+      },
+      {
+        "field": "Last Name",
+        "label": "LASTNAME"
+      }
+    ],
+    "dynamic_fields": [
+      {
+        "field": "Email",
+        "label": "EMAIL"
+      },
+      {
+        "field": "Contact Number",
+        "label": "PHONE_NUMBER"
+      },
+      {
+        "field": "Address",
+        "label": "ADDRESS"
+      }
+    ]
+  },
+  "unstructured": {
+    "regex_patterns": {
+      "EMAIL": "\\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}\\b",
+      "CREDIT_CARD": "\\b(?:\\d{4}[- ]?){3}\\d{4}\\b",
+      "ACCOUNT": "\\b\\d{9,18}\\b",
+      "PHONE": "\\b\\+?\\d{1,3}[-.\\s]?\\d{2,5}[-.\\s]?\\d{3,5}[-.\\s]?\\d{3,5}\\b",
+      "IFSC": "\\b[A-Z]{4}0[A-Z0-9]{6}\\b",
+      "DOB": "\\b\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])\\b",
+      "PASSPORT": "\\b[A-Z][0-9]{7}\\b",
+      "ADDRESS": "\\b\\d+[A-Za-z]?\\s+[^\\n,]+(?:Street|St|Road|Rd|Avenue|Ave|Lane|Ln|Boulevard|Blvd|Block|Baker)\\b",
+      "AADHAAR": "\\b\\d{4}\\s\\d{4}\\s\\d{4}\\b",
+      "PAN": "\\b[A-Z]{5}[0-9]{4}[A-Z]{1}\\b"
+    },
+    "name_context_patterns": [
+      {
+        "pattern": "(?P<prefix>\\bCustomer\\s+)(?P<name>[A-Z][A-Za-z'-]*(?:\\s+[A-Z][A-Za-z'-]*)*)(?P<suffix>\\s+\\(DOB\\b)",
+        "flags": []
+      },
+      {
+        "pattern": "(?P<prefix>\\b(?:Mr|Mrs|Ms)\\.?\\s+)(?P<name>[A-Z][A-Za-z'-]*(?:\\s+[A-Z][A-Za-z'-]*)*)(?P<suffix>\\s+visited\\b)",
+        "flags": []
+      },
+      {
+        "pattern": "(?P<prefix>\\b(?:spouse|mother|father|parent)\\s+of\\s+)(?P<name>[A-Z][A-Za-z'-]*(?:\\s+[A-Z][A-Za-z'-]*)*)(?P<suffix>\\s+works\\b)",
+        "flags": [
+          "IGNORECASE"
+        ]
+      }
+    ]
+  }
+}
