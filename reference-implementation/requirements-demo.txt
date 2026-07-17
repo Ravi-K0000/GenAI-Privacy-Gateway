@@ -1,0 +1,6 @@
+pandas
+requests
+psycopg2-binary
+hvac
+cryptography
+web3

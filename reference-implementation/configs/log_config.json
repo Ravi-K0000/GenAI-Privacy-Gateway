@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "level": "INFO",
+  "log_dir": "logs",
+  "file_logging": true,
+  "console_logging": true,
+  "capture_debug": true,
+  "include_timestamps": true
+}

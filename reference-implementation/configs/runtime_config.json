@@ -1,0 +1,26 @@
+{
+  "runtime_flags": {
+    "enable_performance_metrics": true,
+    "enable_provenance": true
+  },
+  "mapping_store": {
+    "mode": "db",
+    "encryption_provider": "vault"
+  },
+  "rehydration": {
+    "max_passes": 5
+  },
+  "lambda": {
+    "structured_function_name": "lambda_anonymization",
+    "unstructured_function_name": "lambda_anonymization_unstructured"
+  },
+  "external_processing": {
+    "mode": "sftp_share",
+    "lambda_max_rows_without_override": 1000,
+    "on_large_input": "sftp_share",
+    "handoff_root": "handoff",
+    "wait_for_result": true,
+    "poll_interval_seconds": 2,
+    "result_timeout_seconds": 3600
+  }
+}

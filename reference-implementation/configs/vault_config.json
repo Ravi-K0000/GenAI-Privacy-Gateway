@@ -1,0 +1,9 @@
+{
+  "VAULT_ADDR": "",
+  "DEFAULT_KEY_NAME": "",
+  "ROOT_TOKEN": "",
+  "UNSEAL_KEY": "",
+  "AUTO_START": false,
+  "VAULT_BINARY": "",
+  "DEV_MODE": false
+}

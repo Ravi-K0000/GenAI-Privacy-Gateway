@@ -1,0 +1,15 @@
+{
+  "provider": "http_json",
+  "endpoint_url": "",
+  "api_key_env": "LLM_API_KEY",
+  "auth_header": "Authorization",
+  "auth_scheme": "Bearer",
+  "model": "",
+  "request_format": "openai_chat",
+  "response_format": "openai_chat",
+  "headers": {},
+  "max_tokens": 2000,
+  "temperature": 0.0,
+  "batch_size": 25,
+  "delay_seconds": 0.5
+}

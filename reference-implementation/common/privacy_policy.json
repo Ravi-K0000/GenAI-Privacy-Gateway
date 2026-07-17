@@ -1,0 +1,230 @@
+{
+  "structured": {
+    "static_fields": [
+      {
+        "field": "First Name",
+        "label": "FIRSTNAME"
+      },
+      {
+        "field": "Last Name",
+        "label": "LASTNAME"
+      },
+      {
+        "field": "Email",
+        "label": "EMAIL"
+      },
+      {
+        "field": "Contact Number",
+        "label": "PHONE_NUMBER"
+      },
+      {
+        "field": "Address",
+        "label": "ADDRESS"
+      }
+    ],
+    "dynamic_fields": [
+      {
+        "field": "Transaction Description",
+        "label": "TRANSACTION_DESCRIPTION"
+      },
+      {
+        "field": "Loan Officer Remarks",
+        "label": "LOAN_OFFICER_REMARKS"
+      },
+      {
+        "field": "Case Resolution Notes",
+        "label": "CASE_RESOLUTION_NOTES"
+      },
+      {
+        "field": "Customer Notes",
+        "label": "CUSTOMER_NOTES"
+      }
+    ],
+    "deterministic_free_text_patterns": [
+      {
+        "label": "EMAIL",
+        "pattern": "\\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\b"
+      },
+      {
+        "label": "PHONE_NUMBER",
+        "pattern": "(?<!\\d)\\+?\\d[\\d(). -]{8,17}\\d(?!\\d)"
+      },
+      {
+        "label": "ADDRESS",
+        "pattern": "\\b\\d{1,5}(?:\\s*[-/]\\s*\\d{1,5})?,?\\s+[A-Za-z][A-Za-z0-9' -]{1,60}\\s+(?:street|st|road|rd|avenue|ave|lane|ln|boulevard|blvd|drive|dr|court|ct|terrace|pass)\\b"
+      }
+    ],
+    "llm_category_aliases": {
+      "NAMES": "NAME",
+      "PERSON_NAME": "NAME",
+      "PERSON_NAMES": "NAME",
+      "ORGANIZATIONS": "ORGANIZATION",
+      "ORGANISATION": "ORGANIZATION",
+      "ORGANISATIONS": "ORGANIZATION",
+      "LOCATIONS": "LOCATION",
+      "HEALTH_CONDITIONS": "HEALTH_CONTEXT",
+      "HEALTH_CONDITIONS_OR_TREATMENT": "HEALTH_CONTEXT",
+      "MEDICAL_CONDITION": "HEALTH_CONTEXT",
+      "MEDICAL_CONDITIONS": "HEALTH_CONTEXT",
+      "EMPLOYMENT_AND_WORKPLACE_DETAILS": "EMPLOYMENT_CONTEXT",
+      "EMPLOYEE_IDS": "EMPLOYEE_ID",
+      "EMPLOYEE_IDENTIFIERS": "EMPLOYEE_ID",
+      "BOOKING_REFERENCES": "BOOKING_REFERENCE",
+      "BOOKING_OR_PNR_REFERENCES": "BOOKING_REFERENCE",
+      "TRANSACTION_REFERENCES": "TRANSACTION_REFERENCE",
+      "MEDICAL_REFERENCES": "MEDICAL_REFERENCE",
+      "FAMILY_RELATIONSHIPS": "FAMILY_CONTEXT",
+      "TRAVEL_DETAILS": "TRAVEL_CONTEXT",
+      "HOSPITALS": "HEALTHCARE_ORGANIZATION",
+      "AIRLINES": "TRAVEL_PROVIDER"
+    },
+    "contextual_validation_patterns": [
+      {
+        "label": "CONTEXTUAL_REFERENCE",
+        "group": "value",
+        "pattern": "(?P<value>\\b(?:EMP-[A-Z0-9-]{4,}|MED-[A-Z0-9-]{4,}|PNR[A-Z0-9]{5,}|TXN-[A-Z0-9-]{5,})\\b)",
+        "flags": ["IGNORECASE"]
+      },
+      {
+        "label": "GOVERNMENT_IDENTIFIER",
+        "group": "value",
+        "pattern": "(?P<value>\\b[A-Z][0-9]{7}\\b)",
+        "flags": []
+      },
+      {
+        "label": "HEALTH_CONTEXT",
+        "group": "value",
+        "pattern": "(?P<value>\\b(?:diabetes medication|cardiac follow-up|oncology consultation|anxiety treatment|renal therapy|asthma review|[A-Za-z-]+ medication|[A-Za-z-]+ treatment|[A-Za-z-]+ therapy)\\b)",
+        "flags": ["IGNORECASE"]
+      },
+      {
+        "label": "HEALTHCARE_ORGANIZATION",
+        "group": "value",
+        "pattern": "(?P<value>\\b[A-Z][A-Za-z&'-]*(?:\\s+[A-Z]?[A-Za-z&'-]*){0,4}\\s+(?:hospital|clinic|medical centre|medical center|health centre|health center)\\b)",
+        "flags": []
+      },
+      {
+        "label": "CONTEXTUAL_NAME",
+        "group": "value",
+        "pattern": "\\b(?:Employee|Travel request for|spouse of|pt|emp)\\s+(?P<value>[A-Z][A-Za-z'-]+\\s+[A-Z][A-Za-z'-]+)\\b",
+        "flags": ["IGNORECASE"]
+      },
+      {
+        "label": "CONTEXTUAL_NAME",
+        "group": "value",
+        "pattern": "(?P<value>\\b[A-Z][A-Za-z'-]+\\s+[A-Z][A-Za-z'-]+)\\s+(?:is recorded as working|works at|works @|booked travel|visited|flying)\\b",
+        "flags": []
+      },
+      {
+        "label": "CONTEXTUAL_NAME",
+        "group": "value",
+        "pattern": "\\b(?:speaking|spoke|talked|met|discussion|discussed)\\s+(?:with|to)\\s+(?P<value>[A-Z][A-Za-z'-]{2,})(?=\\s*[;,.]|$)",
+        "flags": []
+      },
+      {
+        "label": "EMPLOYMENT_CONTEXT",
+        "group": "value",
+        "pattern": "\\b(?:works at|works @|employed by)\\s+(?P<value>[A-Z][A-Za-z&'-]*(?:\\s+[A-Z]?[A-Za-z&'-]*){0,4})(?=\\s*(?:[;,.]|under\\b|$))",
+        "flags": ["IGNORECASE"]
+      },
+      {
+        "label": "TRAVEL_PROVIDER",
+        "group": "value",
+        "pattern": "\\b(?:travel with|flying)\\s+(?P<value>[A-Z][A-Za-z&'-]*(?:\\s+[A-Z][A-Za-z&'-]*){0,2})\\s+to\\b",
+        "flags": []
+      },
+      {
+        "label": "TRAVEL_LOCATION",
+        "group": "value",
+        "pattern": "\\b(?:travel with|flying)\\s+[A-Z][A-Za-z&'-]*(?:\\s+[A-Z][A-Za-z&'-]*){0,2}\\s+to\\s+(?P<value>[A-Z][A-Za-z&'-]*(?:\\s+[A-Z][A-Za-z&'-]*){0,2})(?=\\s*(?:[;,.]|$))",
+        "flags": []
+      }
+    ]
+  },
+  "unstructured": {
+    "regex_patterns": {
+      "EMAIL": "\\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-z]{2,}\\b",
+      "CREDIT_CARD": "\\b(?:\\d{4}[- ]?){3}\\d{4}\\b",
+      "ACCOUNT": "\\b\\d{9,18}\\b",
+      "PHONE": "\\b\\+?\\d{1,3}[-.\\s]?\\d{2,5}[-.\\s]?\\d{3,5}[-.\\s]?\\d{3,5}\\b",
+      "IFSC": "\\b[A-Z]{4}0[A-Z0-9]{6}\\b",
+      "DOB": "\\b\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])\\b",
+      "PASSPORT": "\\b[A-Z][0-9]{7}\\b",
+      "ADDRESS": "\\b\\d+[A-Za-z]?\\s+[^\\n,]+(?:Street|St|Road|Rd|Avenue|Ave|Lane|Ln|Boulevard|Blvd|Block|Baker)\\b",
+      "AADHAAR": "\\b\\d{4}\\s\\d{4}\\s\\d{4}\\b",
+      "PAN": "\\b[A-Z]{5}[0-9]{4}[A-Z]{1}\\b"
+    },
+    "name_context_patterns": [
+      {
+        "pattern": "(?P<prefix>\\bCustomer\\s+)(?P<name>[A-Z][A-Za-z'-]*(?:\\s+[A-Z][A-Za-z'-]*)*)(?P<suffix>\\s+\\(DOB\\b)",
+        "flags": []
+      },
+      {
+        "pattern": "(?P<prefix>\\b(?:Mr|Mrs|Ms)\\.?\\s+)(?P<name>[A-Z][A-Za-z'-]*(?:\\s+[A-Z][A-Za-z'-]*)*)(?P<suffix>\\s+(?:visited|attended)\\b)",
+        "flags": []
+      },
+      {
+        "pattern": "(?P<prefix>\\b(?:cust|customer|pt|emp)\\s+)(?P<name>[A-Z][A-Za-z'-]*(?:\\s+[A-Z][A-Za-z'-]*)?)(?P<suffix>\\s*[;,])",
+        "flags": [
+          "IGNORECASE"
+        ]
+      },
+      {
+        "pattern": "(?P<prefix>\\b(?:spouse|mother|father|parent)\\s+of\\s+)(?P<name>[A-Z][A-Za-z'-]*(?:\\s+[A-Z][A-Za-z'-]*)*)(?P<suffix>\\s+works\\b)",
+        "flags": [
+          "IGNORECASE"
+        ]
+      }
+    ],
+    "contextual_entity_patterns": [
+      {
+        "label": "LOCATION",
+        "group": "value",
+        "pattern": "(?P<prefix>\\b(?:visited|attended)\\s+)(?P<value>[A-Z][A-Za-z&.'-]*(?:\\s+[A-Z]?[A-Za-z&.'-]*){0,3}\\s+(?:hospital|consultants|clinic|medical centre|medical center|healthcare centre|healthcare center))(?P<suffix>\\b)",
+        "flags": [
+          "IGNORECASE"
+        ]
+      },
+      {
+        "label": "ORGANIZATION",
+        "group": "value",
+        "pattern": "(?P<prefix>\\bof\\s+)(?P<value>[A-Z][A-Za-z&.'-]*(?:\\s+[A-Z][A-Za-z&.'-]*){0,3}\\s+(?:Corp|Ltd|Limited|LLC|Inc))(?P<suffix>\\s+transferred\\b)",
+        "flags": []
+      },
+      {
+        "label": "EMPLOYMENT_CONTEXT",
+        "group": "value",
+        "pattern": "(?P<prefix>\\bworks\\s+at\\s+)(?P<value>[A-Z][A-Za-z&'-]*(?:\\s+[A-Z][A-Za-z&'-]*){0,4}(?:\\s+HQ)?)(?P<suffix>[\\.,\\n]|$)",
+        "flags": [
+          "IGNORECASE"
+        ]
+      },
+      {
+        "label": "ORGANIZATION",
+        "group": "value",
+        "pattern": "(?P<prefix>\\bwith\\s+)(?P<value>[A-Z][A-Za-z&'-]*(?:\\s+[A-Z][A-Za-z&'-]*){0,3})(?P<suffix>\\s*,\\s+for\\s+trip\\b)",
+        "flags": []
+      },
+      {
+        "label": "LOCATION",
+        "group": "value",
+        "pattern": "(?P<prefix>\\btrip\\s+to\\s+)(?P<value>[A-Z][A-Za-z&'-]*(?:\\s+[A-Z][A-Za-z&'-]*){0,2})(?P<suffix>[\\.,\\n]|$)",
+        "flags": []
+      },
+      {
+        "label": "LOCATION",
+        "group": "value",
+        "pattern": "(?P<prefix>\\bissued\\s+in\\s+)(?P<value>[A-Z][A-Za-z&'-]*(?:\\s+[A-Z][A-Za-z&'-]*){0,2})(?P<suffix>[\\.,\\n]|$)",
+        "flags": []
+      },
+      {
+        "label": "LOCATION",
+        "group": "value",
+        "pattern": "(?P<prefix>\\bverification\\s+at\\s+)(?P<value>[A-Z][A-Za-z&'-]*(?:\\s+[A-Z][A-Za-z&'-]*){0,2}\\s+airport)(?P<suffix>\\b)",
+        "flags": [
+          "IGNORECASE"
+        ]
+      }
+    ]
+  }
+}

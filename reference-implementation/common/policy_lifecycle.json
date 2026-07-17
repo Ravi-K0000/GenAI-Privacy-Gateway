@@ -1,0 +1,47 @@
+{
+  "policy_id": "privacy-gateway-reference-policy",
+  "version": "1.0.0",
+  "status": "active",
+  "effective_from": "2026-06-24",
+  "effective_to": null,
+  "owner": "privacy-office",
+  "approved_by": "data-protection-officer",
+  "approval_date": "2026-06-24",
+  "change_reason": "Reference prototype baseline policy",
+  "applies_to": [
+    "structured",
+    "unstructured"
+  ],
+  "enforcement": {
+    "mode": "enforce",
+    "fail_on_policy_load_error": true,
+    "fail_on_unknown_policy_field": false
+  },
+  "runtime_flags": {
+    "enable_static_anonymization": true,
+    "enable_dynamic_anonymization": true,
+    "enable_rehydration": true,
+    "enable_provenance": true,
+    "enable_performance_metrics": true
+  },
+  "mapping_storage": {
+    "mode": "db",
+    "allowed_modes": [
+      "local",
+      "db",
+      "both"
+    ]
+  },
+  "mapping_security": {
+    "encryption_provider": "vault",
+    "vault_addr_env": "VAULT_ADDR",
+    "vault_token_env": "VAULT_TOKEN",
+    "vault_transit_key_env": "VAULT_TRANSIT_KEY",
+    "default_transit_key": "pii-kek",
+    "allow_unencrypted_dev_override": true
+  },
+  "audit": {
+    "log_policy_version_per_run": true,
+    "include_policy_hash": true
+  }
+}

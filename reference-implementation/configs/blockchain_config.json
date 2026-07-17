@@ -1,0 +1,11 @@
+{
+  "enabled": false,
+  "provider": "",
+  "rpc_url": "",
+  "account_address": "",
+  "private_key": "",
+  "chain_id": 1337,
+  "gas": 100000,
+  "gas_price_gwei": 10,
+  "anchor_digest": false
+}
