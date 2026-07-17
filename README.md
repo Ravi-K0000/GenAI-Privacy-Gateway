@@ -116,4 +116,4 @@ Citation information will be added following publication of the accompanying pap
 
 # License
 
-License information will be added with the public repository release.
+This project is licensed under the Apache License 2.0. See the LICENSE file for details.
