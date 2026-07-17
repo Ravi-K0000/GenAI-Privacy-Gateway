@@ -1,275 +1,278 @@
-# Privacy Gateway Reference Prototype
+# Overview
 
-This reference prototype demonstrates policy-driven anonymization, external processing, rehydration, metrics, and provenance for structured and unstructured data.
+This reference implementation accompanies the paper **"A GenAI-Assisted Privacy Gateway for Secure Third-Party Data Processing"** and demonstrates a configurable implementation of the proposed gateway architecture. It shows how sensitive enterprise data can be transformed before leaving the enterprise trust boundary, processed by external systems, and selectively restored upon return, while maintaining referential consistency, auditability, and policy-driven control.
 
-## Quickstart
+Unlike the Quick Demo, the reference implementation includes configurable gateway components such as policy-driven anonymization, GenAI-assisted contextual detection, deterministic placeholder generation, configurable mapping protection, secure rehydration, provenance generation, and performance evaluation. The implementation is designed to demonstrate the complete gateway processing lifecycle, while staying independent of any specific downstream processor, AI provider, or deployment platform.
 
-1. Create a Python environment and install dependencies:
+To maintain a clear architectural boundary, this repository intentionally focuses on the privacy gateway itself. Infrastructure provisioning, production deployment artefacts, and downstream processing implementations are intentionally excluded, allowing the gateway to remain technology-neutral and adaptable.
 
-   ```bash
-   pip install -r requirements-demo.txt
-   ```
+# Scope of the Reference Implementation
 
-2. Set runtime secrets and endpoints in the files under `configs/`. Environment variables can still override config values for local testing.
+The reference implementation includes:
 
-3. Review policy files:
+- Policy-driven detection and anonymization for structured and unstructured data
+- GenAI-assisted contextual identification of sensitive information
+- Deterministic placeholder generation and replacement
+- Configurable mapping protection using a database and secrets vault
+- Secure rehydration with dependency-aware placeholder restoration
+- Provenance generation and audit logging
+- Runtime metrics and performance evaluation
+- Sample datasets and reference configuration files
 
-   - `common/privacy_policy.json`
-   - `common/policy_lifecycle.json`
-   - `configs/runtime_config.json`
-   - `configs/llm_config.json`
-   - `configs/db_config.json`
-   - `configs/vault_config.json`
-   - `configs/blockchain_config.json`
-   - `configs/log_config.json`
+The following components are intentionally outside the scope of this repository:
 
-4. Run a flow:
+- Infrastructure provisioning (CloudFormation, Terraform, Kubernetes, etc.)
+- Production deployment configurations
+- Downstream processing implementations (AWS Lambda, Java, .NET, Python, or other consumer applications)
+- Enterprise-specific integrations and custom connectors
+- Authentication, authorization, and operational security controls required for production deployments
 
-   ```bash
-   python run_demo.py structured
-   python run_demo.py unstructured
-   python run_demo.py both
-   ```
+# Architecture Overview
 
-Outputs are written under `output/<domain>/...`. Run logs are written under top-level `logs/`. Every run artifact receives a sidecar metadata file with `run_id`, `policy_id`, `policy_version`, and `policy_hash`.
+At a high level, the gateway performs the following sequence of operations:
 
-Third-party responses are saved inside a gateway metadata wrapper. The gateway `run_id` is authoritative even when the external processor does not echo it or returns its own ID.
+1. Load runtime configuration and anonymization policies.
+2. Detect sensitive information using deterministic policy rules together with GenAI-assisted contextual identification.
+3. Replace sensitive values with deterministic placeholders while securely persisting the associated mappings.
+4. Transfer the anonymized dataset to an external processor for downstream business processing.
+5. Validate the returned data and selectively restore original values through controlled rehydration.
+6. Produce the final output together with audit logs, provenance records, and execution metrics.
 
-Optional environment overrides include `LLM_PROVIDER`, `LLM_ENDPOINT_URL`, `LLM_API_KEY`, `LLM_MODEL`, `LLM_MAX_TOKENS`, `LLM_TEMPERATURE`, `LLM_BATCH_SIZE`, `LLM_DELAY_SECONDS`, `STRUCTURED_LAMBDA_NAME`, `UNSTRUCTURED_LAMBDA_NAME`, `MAPPING_STORE`, `MAPPING_ENCRYPTION_PROVIDER`, `MAPPING_DB_NAME`, `MAPPING_DB_USER`, `MAPPING_DB_PASSWORD`, `MAPPING_DB_HOST`, `MAPPING_DB_PORT`, `VAULT_ADDR`, `VAULT_ROOT_TOKEN`, `VAULT_UNSEAL_KEY`, `VAULT_TRANSIT_KEY`, `BLOCKCHAIN_ENABLED`, `BLOCKCHAIN_ANCHOR_DIGEST`, `BLOCKCHAIN_RPC_URL`, `BLOCKCHAIN_ACCOUNT_ADDRESS`, and `BLOCKCHAIN_PRIVATE_KEY`.
+The implementation supports both structured datasets (CSV) and unstructured text documents through a common processing model while allowing each processing pipeline to apply data-type specific detection and transformation strategies.
 
-## LLM Provider
+The gateway itself remains independent of downstream processors. Any external application capable of preserving placeholder integrity can participate in the processing workflow, regardless of implementation language, runtime platform, or deployment model.
 
-Dynamic LLM detection is routed through a provider-neutral HTTP interface. Configure the endpoint in `configs/llm_config.json` or through environment variables:
+For a detailed discussion of the gateway architecture, design rationale, and evaluation, refer to the accompanying paper.
 
-```json
-{
-  "provider": "http_json",
-  "endpoint_url": "https://your-enterprise-llm-endpoint/chat/completions",
-  "api_key_env": "LLM_API_KEY",
-  "auth_header": "Authorization",
-  "auth_scheme": "Bearer",
-  "model": "your-model-name",
-  "request_format": "openai_chat",
-  "response_format": "openai_chat",
-  "max_tokens": 2000,
-  "temperature": 0.0,
-  "batch_size": 25,
-  "delay_seconds": 0.5
-}
+# Repository Structure
+
+The reference implementation is organized into modular components that separate configuration, policy management, anonymization, rehydration, provenance, and runtime execution responsibilities.
+
+```text
+reference-implementation/
+│
+├── common/                 Shared policy and utility components
+├── configs/                Runtime, provider, database and vault configuration
+├── structured/             Structured data anonymization pipeline
+├── unstructured/           Unstructured text anonymization pipeline
+├── rehydration/            Placeholder restoration engine
+├── provenance/             Provenance generation and audit components
+├── sample-data/            Sample structured and unstructured datasets
+├── handoff/                External processing exchange directory
+├── logs/                   Runtime logs and execution reports
+├── output/                 Generated processing results
+│
+├── run_demo.py             Gateway execution entry point
+├── requirements-demo.txt   Python dependencies
+└── README.md
 ```
 
-The endpoint may be an enterprise gateway, private hosted model, local model server, Azure-compatible deployment, or any other LLM endpoint that accepts the configured request format and returns the configured response format. The default request/response format is OpenAI-compatible chat JSON. A simple prompt/text format is also supported through `request_format: "prompt"` and `response_format: "text"`. Authentication is configurable through `auth_header` and `auth_scheme`; for example, Azure-style API-key endpoints can use `auth_header: "api-key"` and `auth_scheme: ""`.
+## Component Description
 
-Set `batch_size` and `delay_seconds` in `configs/llm_config.json` to tune large runs. The configured batch size is not a fixed code path: unstructured processing starts with that value and recursively splits only a batch whose provider response is malformed JSON. Throttling and connection failures continue to use retry backoff. Each LLM batch is logged with provider, batch number, record count, and character count so long-running runs show visible progress without printing PII.
+| Component | Purpose |
+|-----------|---------|
+| **common** | Shared utilities, policy loading, configuration handling, and reusable processing components. |
+| **configs** | Runtime configuration, provider settings, anonymization policies, database configuration, and vault integration. |
+| **structured** | Processing pipeline for structured datasets such as CSV files. |
+| **unstructured** | Processing pipeline for free-text and document-based content. |
+| **rehydration** | Secure restoration of original values using protected mappings and dependency-aware placeholder replacement. |
+| **provenance** | Generation of audit artefacts, integrity verification, and provenance records. |
+| **sample-data** | Example datasets for demonstrating structured and unstructured processing. |
+| **handoff** | Exchange location representing data transferred to and returned from downstream processing. |
+| **logs** | Runtime execution logs generated during gateway processing. |
+| **output** | Final anonymized, processed, and rehydrated datasets together with generated artefacts. |	
 
-For structured CSVs, `First Name`, `Last Name`, `Email`, `Contact Number`, and `Address` are static anonymization fields. Before LLM processing, the same deterministic stage removes emails, phone numbers, confidently formatted postal addresses, and the row's known full name from `Transaction Description`, `Loan Officer Remarks`, `Case Resolution Notes`, and `Customer Notes`. The partially anonymized free text is then sent to the configured LLM for contextual and ambiguous PII detection. The structured prompt explicitly covers health, employment, family, travel, organization and location context, reference identifiers, and common shorthand such as `cust`, `emp id`, `txn`, `pnr`, `appt`, `hosp`, `mob`, and `addr`. LLM results are applied within each batch while one run-level placeholder registry preserves deterministic reuse across batches. Policy-defined residual patterns then select only suspicious remaining rows for one smaller targeted recovery pass. LLM category aliases are normalized to stable labels such as `NAME`, `HEALTH_CONTEXT`, `EMPLOYEE_ID`, and `BOOKING_REFERENCE`.
 
-For unstructured text, static regex and name-context patterns run first. Static matches are replaced in bounded regex passes instead of rescanning the full document once per detected value. Obvious employee, travel, transaction, medical and passport references are handled deterministically before the remaining text is sent to the configured LLM. Policy patterns also cover contextual names following honorifics or shorthand such as `cust`, `customer`, `pt`, and `emp`, healthcare organizations using `Centre` or `Center`, and company names in employee transaction contexts. The unstructured prompt detects contextual identifiers and sensitive context such as health context, employment context, family relationships, travel context, financial activity, locations, organizations, reference numbers, and other snippets tied to an individual or their activities. Existing placeholders are immutable during LLM replacement, preventing one detection from corrupting another placeholder. Recovery considers concrete residual validation findings and uses the configured provider batch size with the same automatic split behavior.
+# Processing Pipeline
 
-## External Processing
+The reference implementation follows a deterministic processing pipeline that transforms sensitive enterprise data before external processing and selectively restores original values upon completion. The overall workflow remains consistent for both structured and unstructured datasets, while allowing each processing path to apply data-type specific detection strategies.
 
-External processor behavior is controlled in `configs/runtime_config.json`:
+## 1. Configuration and Policy Loading
 
-```json
-{
-  "external_processing": {
-    "mode": "lambda",
-    "lambda_max_rows_without_override": 100,
-    "on_large_input": "sftp_share",
-    "handoff_root": "handoff",
-    "wait_for_result": true,
-    "poll_interval_seconds": 2,
-    "result_timeout_seconds": 3600
-  }
-}
+The execution begins by loading the runtime configuration and anonymization policy. These configurations define the processing mode, GenAI provider settings, mapping protection mechanisms, provenance options, and sensitive data categories to be identified during processing.
+
+## 2. Sensitive Data Identification
+
+Input data is analysed by combining deterministic policy rules with GenAI-assisted contextual identification.
+
+Deterministic rules identify explicitly defined sensitive values such as names, email addresses, phone numbers, account numbers, and other policy-defined entities. GenAI-assisted analysis identifies contextual or implicit references.
+
+## 3. Placeholder Generation
+
+Each detected sensitive value is replaced with a deterministic placeholder while preserving referential consistency throughout the dataset.
+
+Original values are never exposed to external processors. Instead, protected mappings between original values and generated placeholders are securely persisted using the configured database and secrets management components.
+
+## 4. External Processing
+
+The anonymized dataset is transferred to an external processing component for downstream business operations.
+
+The gateway does not impose any technology requirements on the downstream processor. Any application capable of preserving placeholder integrity may participate in the processing workflow, including enterprise applications, AI services, cloud functions, or custom business services.
+
+## 5. Controlled Rehydration
+
+Following external processing, the returned dataset is validated before rehydration begins.
+
+Protected mappings are retrieved and original values are selectively restored using dependency-aware placeholder replacement to ensure accurate reconstruction of the original data.
+
+## 6. Provenance and Audit Generation
+
+Throughout execution, the gateway records processing metadata, execution metrics, provenance information, and audit artefacts required to support traceability and processing verification.
+
+Depending on the runtime configuration, provenance records may also be integrity protected through cryptographic hashing and optional external anchoring mechanisms.
+
+## 7. Output Generation
+
+The gateway produces the final restored dataset together with execution logs, provenance records, runtime metrics, and processing artefacts generated during execution.
+
+
+# Prerequisites
+
+Before executing the gateway, ensure the following prerequisites are available:
+
+- Python 3.11 or later
+- Access to a GenAI service operating within the enterprise trust boundary
+- Configured database for mapping persistence
+- Configured secrets vault for encryption key management
+- Ganache (optional, when blockchain provenance anchoring is enabled)
+- Git (optional, for cloning the repository)
+
+Python package dependencies are listed in `requirements-demo.txt` and can be installed using:
+
+```bash
+pip install -r requirements-demo.txt
 ```
 
-The prototype supports multiple external-processing integrations behind the same gateway boundary:
 
-- `lambda`: invokes the existing AWS Lambda functions. This path remains unchanged.
-- `sftp_share`: publishes an anonymized file and manifest to an SFTP-mounted or otherwise shared directory, waits for a correlated result manifest, and then rehydrates the returned data.
-- `file_drop`: publishes a controlled handoff result without waiting.
-- `skip`: deliberately skips external processing.
+# Configuration
 
-With the default settings, small structured runs call Lambda. Structured runs over the threshold use `sftp_share`, which is suitable for 5k/20k/50k demonstrations without coupling the gateway to the reference processor. Set `on_large_input` to `lambda` or increase the threshold to force Lambda for larger files.
+The gateway is designed to be configuration-driven. Runtime behaviour is controlled through a collection of configuration files that define processing policies, provider settings, database connections, vault integration, and provenance options. 
 
-The shared-folder contract is transport-neutral: `handoff_root` can be a local directory for the reference demonstration or a filesystem path mounted from an SFTP-managed share. The gateway does not import or start the external processor. Additional connectors can be added behind the same third-party client contract later. For numbered unstructured text, manifests and processor results report logical numbered records rather than physical nonblank lines.
+Before running the gateway, review the configuration files under the `configs/` directory and update provider credentials, database connections, vault settings, and runtime options as appropriate for your environment.
 
-Start the independent reference processor in a second PowerShell window before running a large structured flow:
+## Runtime Configuration
 
-```powershell
-python run_external_processor.py
-```
+The runtime configuration defines the overall execution behaviour of the gateway, including processing mode, logging options, output locations, and runtime feature selection.
 
-Then run the gateway normally:
+## Provider Configuration
 
-```powershell
+Provider configuration specifies the GenAI service used for contextual sensitive data identification together with any provider-specific connection settings required by the selected deployment.
+
+## Anonymization Policy
+
+The anonymization policy defines the categories of sensitive information to be detected, the replacement strategy to be applied, and processing rules for both structured and unstructured data.
+
+## Database Configuration
+
+Database configuration controls the persistence of protected placeholder mappings required to support secure rehydration following external processing.
+
+## Vault Configuration
+
+Vault configuration defines the secure storage mechanism used to protect encryption keys and sensitive gateway secrets.
+
+## Provenance Configuration
+
+Provenance configuration controls the generation of audit records, integrity verification, and optional blockchain anchoring for processing provenance.
+
+
+# Running the Gateway
+
+After completing the required configuration, the gateway can be executed from the reference implementation root directory.
+
+```bash
 python run_demo.py structured
 ```
 
-The exchange layout is:
-
-```text
-handoff/
-  outbound/<domain>/<run_id>/
-    anonymized.csv|txt
-    request_manifest.json
-  inbound/<domain>/<run_id>/
-    processed_result.csv|txt
-    response_manifest.json
-```
-
-The reference processor performs deterministic risk enrichment; it is not a pass-through. It has no mapping database or Vault access. Input and result files are written under temporary names and atomically renamed, and each manifest is published last as the readiness signal. A per-request atomic claim prevents two processor instances from handling the same request. The gateway accepts only a completed response with the expected `run_id`, domain, filename, and SHA-256 digest.
-
-## Mapping Storage
-
-Set `mapping_storage.mode` in `common/policy_lifecycle.json`, or override with `MAPPING_STORE`.
-
-Allowed values:
-
-- `local`: write mapping JSON files under `output/<domain>/mappings`
-- `db`: write/read mappings from Postgres using `mappings_table` for structured runs and `mappings_unstructured_table` for unstructured runs
-- `both`: write local JSON and Postgres
-
-The whitepaper-reference default is `db` with Vault encryption. Set `mapping_store.mode` to `local` only for isolated troubleshooting.
-
-Vault-backed encryption is the default mapping security model:
+For unstructured data:
 
 ```bash
-MAPPING_ENCRYPTION_PROVIDER=vault
-VAULT_ADDR=http://127.0.0.1:8200
-VAULT_ROOT_TOKEN=root
-VAULT_UNSEAL_KEY=<unseal-key-if-needed>
-VAULT_TRANSIT_KEY=pii-kek
+python run_demo.py unstructured
 ```
 
-When Vault is enabled, mapping values are encrypted before persistence. The prototype can auto-start a local Vault dev server, unseal it when an unseal key is provided, enable the transit engine, and create the configured transit key. Rehydration decrypts mappings inside the gateway boundary. For isolated development only, `MAPPING_ENCRYPTION_PROVIDER=none` stores plaintext mappings.
+During execution, the gateway performs the following high-level operations:
 
-After installing dependencies, verify Vault setup with:
+1. Loads the runtime configuration and anonymization policy.
+2. Processes structured or unstructured input data.
+3. Identifies sensitive information using deterministic rules together with GenAI-assisted contextual detection.
+4. Replaces sensitive values with deterministic placeholders and securely persists the associated mappings.
+5. Transfers the anonymized data for external processing.
+6. Validates the returned dataset and performs controlled rehydration.
+7. Generates the final output together with execution logs, provenance records, and runtime metrics.
 
-```bash
-python -m common.vault_check
-```
-
-This command prepares Vault, ensures the transit key exists, encrypts a test value, decrypts it, and fails if the round-trip does not match.
-
-## Rehydration Integrity
-
-Rehydration is dependency-aware. A restored mapping value may expose another
-placeholder created by an earlier anonymization stage, so the gateway performs
-bounded replacement passes until no placeholders remain or no progress is
-possible. Configure the safety ceiling in `configs/runtime_config.json`:
-
-```json
-{
-  "rehydration": {
-    "max_passes": 5
-  }
-}
-```
-
-`REHYDRATION_MAX_PASSES` provides an environment override. The gateway checks
-reachable mapping dependencies for cycles and validates the result after the
-last pass. Cycles, unresolved placeholders, and unexpected third-party
-placeholders produce `rehydration_failed_<run_id>.json`; no partial rehydrated
-output is published.
-
-The primary `Rehydration` benchmark measures integrity checking, placeholder
-restoration, and output construction. Mapping retrieval/Vault decryption is
-reported separately, and `End-to-end rehydration` includes every phase.
-
-## Policy And Regex Rules
-
-Regex detection rules live in `common/privacy_policy.json` under `unstructured.regex_patterns`. There is no separate regex config file; the policy is the single source of truth.
-
-## Blockchain Provenance
-
-Blockchain settings are in `configs/blockchain_config.json`.
-
-By default, the prototype creates a top-level run log, zips the run log into `logs_bundle_<timestamp>.zip`, hashes the zip with SHA-256, writes a local provenance ledger entry, and anchors the bundle digest to Ganache or another Web3-compatible local chain.
-
-```json
-{
-  "enabled": true,
-  "anchor_digest": true,
-  "rpc_url": "http://127.0.0.1:7545",
-  "account_address": "...",
-  "private_key": "..."
-}
-```
-
-Only the SHA-256 digest is anchored. Logs, mappings, payloads, and sensitive data are not written to chain.
-
-Set `enabled` or `anchor_digest` to `false` in `configs/blockchain_config.json` only when you deliberately want to run without blockchain anchoring.
-
-Verify provenance hashes after a run:
-
-```bash
-python -m provenance.verify_audit
-python -m provenance.verify_audit --check-chain
-```
-
-## Logging
-
-Logging is controlled by `configs/log_config.json`. The default is debug-level console and file logging under top-level `logs/`. The code logs run boundaries, mapping store choices, DB table usage, Lambda invocation boundaries, rehydration mapping counts, provenance bundle creation, and blockchain anchoring status. It does not log PII values, mappings, prompts, or raw LLM/Lambda responses.
-
-## Metrics
-
-Performance metrics are controlled by `runtime_flags.enable_performance_metrics` or `ENABLE_PERFORMANCE_METRICS`.
-
-The anonymization metric includes static + dynamic anonymization only. It excludes config loading, mapping persistence, third-party processing, external handoff waiting, blockchain/provenance, configured LLM inter-batch delay, retry backoff sleeps, and unrelated waiting. Metrics also show static anonymization, LLM inference, dynamic replacement, and excluded provider waits separately.
-
-Structured runs write `output/structured/validation/anonymization_validation_<run_id>.json`. This post-anonymization check reports residual obvious emails, phones, known row names and addresses, policy-defined contextual findings, and malformed placeholders without storing raw PII findings. Residual findings after the targeted recovery pass mark anonymization as `completed_with_warnings`.
-
-Rehydration timing starts before placeholder integrity and mapping retrieval and ends after the rehydrated output is written. It therefore includes DB/local mapping retrieval, Vault-backed decryption, placeholder restoration, integrity checks, and output construction. Metrics show those phases separately. External processing and handoff waiting remain excluded.
-
-`Placeholder restoration fidelity` measures whether returned placeholders were valid and resolved. For shape-preserving structured responses, the gateway additionally compares every original field and reports exact field fidelity, semantic numeric fidelity, changed fields, and changed rows. Structured CSVs are read as strings throughout the flow so textual representations such as `3708.0` are preserved.
-
-For derived third-party outputs, omitted placeholders are allowed because the processor may return insights, aggregates, or summaries instead of the original record shape. Fidelity is `100%` when all placeholders that are returned are known and successfully rehydrated, and no unresolved placeholders remain.
-
-Scope of the Reference Implementation
-
-This repository provides the complete implementation of the Privacy Gateway itself. Components responsible for downstream third-party processing are intentionally excluded, as they are deployment-specific and may be implemented using custom applications, serverless functions, enterprise integration platforms, commercial products, or manual workflows. The gateway exposes the artifacts required for such integrations without prescribing a particular processing technology.
+Upon successful execution, processing artefacts are written to the configured output directories for further inspection and validation.
 
 
+# External Processing Contract
 
-The repository includes gateway-side adapters for two third-party processing integration patterns: synchronous function invocation, represented by an AWS Lambda-compatible adapter, and asynchronous file handoff, represented by the file/SFTP-style handoff contract. The third-party processor implementations themselves are environment-specific and are not included; adopters can implement them using AWS Lambda, Java, .NET, Python, manual workflows, or other enterprise processing stacks.
+Once anonymization is complete, the transformed dataset may be processed by any external application capable of preserving placeholder integrity.
 
+Examples include:
 
-By default, the demo uses the file/SFTP-style handoff path for external processing. This keeps the repository cloud-provider-neutral and avoids requiring an AWS runtime.
+- Third-party service providers
+- Cloud-based processing platforms
+- Custom business applications
+- Batch processing pipelines
+- External AI services
 
-Supported external_processing.mode values include:
+To ensure successful rehydration, downstream processors are expected to satisfy the following requirements:
 
-- sftp_share / file_handoff: writes anonymized payloads to the handoff folder and waits for an external processor response.
-- file_drop: writes a handoff manifest and does not invoke a processor.
-- skip: bypasses external processing for local inspection.
-- lambda: invokes configured AWS Lambda functions synchronously. This mode requires boto3, AWS credentials, and deployed Lambda functions compatible with the gateway payload contract.
+- Preserve generated placeholders without modification.
+- Do not create, remove, or alter placeholder identifiers.
+- Return the processed dataset using the same placeholder values received from the gateway.
+- Treat placeholder values as opaque identifiers rather than business data.
 
-The repository includes the gateway-side Lambda adapter for reference, but boto3 is not installed by default. Add boto3 to your environment only if using Lambda mode.
+Failure to preserve placeholder integrity may prevent successful rehydration or result in incomplete restoration of sensitive values.
 
-By default, the demo uses the file/SFTP-style handoff path for external processing. This keeps the repository cloud-provider-neutral and avoids requiring an AWS runtime.
-
-in this version, sftp_share implementation is left for end user. By default it will behave same as local handoff-folder contract. The naming allows adopters to map the pattern to SFTP shares, managed file transfer, object storage, manual drops, or other enterprise handoff mechanisms.
-
-
-The runtime configuration includes a `lambda` section with default function-name placeholders. These values are not used unless `external_processing.mode` is set to `lambda`. The default mode is `sftp_share`, which uses the file handoff contract and does not require AWS, boto3, or deployed Lambda functions.
-
-Note that currently file_handoff is an alias for sftp_share.
-
-If `external_processing.mode` is changed to `lambda`, users must provide compatible AWS Lambda functions, configure AWS credentials, and install boto3 in their Python environment. The Lambda branch is retained as an optional synchronous integration adapter; the default repository configuration remains file-handoff based and cloud-provider-neutral. `lambda_max_rows_without_override` applies only in Lambda mode. It is ignored for the default `sftp_share` / `file_handoff` modes.
+The gateway intentionally places no restrictions on the implementation language, deployment model, or runtime platform of downstream processors, provided the placeholder preservation requirements are satisfied.
 
 
-Default sftp_share mode may wait for an inbound response. Default mode uses file/SFTP-style handoff and waits for a response in the inbound handoff folder. For local inspection without an external processor, set external_processing.mode to "file_drop" or "skip".
+# Runtime Output
 
-Users must create:
-sample-data/structured/sample_data.csv
-sample-data/unstructured/sample_transactions.txt
+Upon successful execution, the gateway produces a collection of processing artefacts that support validation, auditability, and secure rehydration.
 
-Vault preparation is performed at runtime when mapping encryption is configured with `encryption_provider: "vault"`. The helper can validate/connect to Vault, optionally start a dev-mode Vault server, unseal it when configured, and ensure the transit engine/key exist.
+Depending on the selected processing mode and runtime configuration, the generated outputs may include:
+
+- Anonymized datasets prepared for external processing
+- Processed datasets returned by downstream processors
+- Rehydrated datasets with original sensitive values restored
+- Runtime execution logs
+- Provenance records and integrity artefacts
+- Performance metrics and execution statistics
+
+The exact set of generated artefacts depends on the configured runtime options and enabled gateway features.
+
+Output files are written to the configured output directories and may be retained for validation, benchmarking, audit, or demonstration purposes.
 
 
-Repository Scope
+# Security Considerations
+
+This reference implementation demonstrates the architectural concepts presented in the accompanying paper and is intended for evaluation, experimentation, and technology validation.
+
+Organizations adopting the gateway should review and strengthen the implementation to align with their operational security requirements.
+
+In particular, production deployments should consider:
+
+- Secure management of database credentials and encryption keys.
+- Enterprise authentication and authorization mechanisms.
+- Network security and encrypted communication channels.
+- Secrets management using enterprise-grade vault solutions.
+- Infrastructure monitoring, logging, and operational alerting.
+- Backup, disaster recovery, and high-availability strategies.
+- Compliance with organizational governance and regulatory requirements.
 
 
-This repository contains the reference implementation of the Privacy Gateway itself. Runtime artifacts (datasets, logs, hand-off files, generated outputs and external processing implementations) are intentionally excluded from version control. These components are created during execution or are deployment-specific and should be supplied by adopters as appropriate.
+# Design Assumptions and Limitations
+
+This reference implementation has been developed to demonstrate the architectural concepts presented in the accompanying paper. The implementation assumes a trusted enterprise environment in which gateway configuration, mapping persistence, secrets management, and GenAI-assisted detection operate within the enterprise trust boundary.
+
+The implementation further assumes that downstream processors preserve placeholder integrity throughout processing. Modification or removal of generated placeholders may prevent successful rehydration.
+
+The reference implementation intentionally excludes several aspects that would typically be addressed as part of an enterprise production deployment, including:
+
+- Infrastructure provisioning and deployment automation.
+- Enterprise-specific integrations and custom connectors.
+- Operational monitoring, scaling, and high-availability configurations.
+- Authentication, authorization, and organization-specific security controls.
+
+These design choices are intentional and allow the implementation to remain focused on demonstrating the gateway architecture while remaining adaptable to different enterprise platforms, deployment models, and downstream processing technologies.
 
