@@ -11,7 +11,6 @@ __pycache__/
 logs/
 output/
 handoff/
-sample-data/
 
 .vscode/
 .idea/

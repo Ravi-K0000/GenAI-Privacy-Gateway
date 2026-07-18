@@ -17,7 +17,8 @@ The reference implementation includes:
 - Secure rehydration with dependency-aware placeholder restoration
 - Provenance generation and audit logging
 - Runtime metrics and performance evaluation
-- Sample datasets and reference configuration files
+- Sample structured and unstructured datasets for demonstration and validation
+- Reference configuration files
 
 The following components are intentionally outside the scope of this repository:
 
@@ -77,7 +78,7 @@ reference-implementation/
 | **unstructured** | Processing pipeline for free-text and document-based content. |
 | **rehydration** | Secure restoration of original values using protected mappings and dependency-aware placeholder replacement. |
 | **provenance** | Generation of audit artefacts, integrity verification, and provenance records. |
-| **sample-data** | Example datasets for demonstrating structured and unstructured processing. |
+| **sample-data** | Representative structured and unstructured sample datasets for demonstration, validation, and familiarization with the expected gateway input formats. |
 | **handoff** | Exchange location representing data transferred to and returned from downstream processing. |
 | **logs** | Runtime execution logs generated during gateway processing. |
 | **output** | Final anonymized, processed, and rehydrated datasets together with generated artefacts. |	
@@ -200,6 +201,14 @@ During execution, the gateway performs the following high-level operations:
 7. Generates the final output together with execution logs, provenance records, and runtime metrics.
 
 Upon successful execution, processing artefacts are written to the configured output directories for further inspection and validation.
+
+## Sample Datasets
+
+The repository includes representative structured and unstructured sample datasets under the `sample-data/` directory to simplify initial setup and evaluation.
+
+The datasets are organized into separate `structured/` and `unstructured/` directories corresponding to the two supported processing pipelines.
+
+These datasets are intended to allow users to execute both processing pipelines with minimal configuration. They are provided for demonstration purposes only and do not represent the benchmark datasets used for the performance evaluation presented in the accompanying paper.
 
 
 # External Processing Contract
