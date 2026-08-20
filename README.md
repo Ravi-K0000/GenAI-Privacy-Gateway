@@ -91,8 +91,8 @@ This repository accompanies the research paper:
 The paper introduces a privacy gateway architecture that enables organizations to leverage third-party services while maintaining control over sensitive information. The proposed approach combines deterministic policy enforcement with GenAI-assisted contextual detection, reversible placeholder generation, secure mapping management, controlled rehydration, and provenance tracking.  
 
 **Publication**
-- arXiv: *(to be added)*
-- DOI: *(to be added)*
+- SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7293198
+- Zenodo archive: https://doi.org/10.5281/zenodo.21454148
 
 ---
 
