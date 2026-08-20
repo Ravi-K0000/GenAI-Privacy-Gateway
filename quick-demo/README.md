@@ -3,7 +3,7 @@
 This is a self-contained demonstration of the Privacy Gateway architecture. It uses local sample data, policy-driven pseudonymization, mock external processing, and mapping-based rehydration without requiring databases, cloud services, or LLM connectivity.
 
 ```bash
-python privacygateway.py demo
+python run_demo.py both
 ```
 
 The quick demo has no DB, Vault, Lambda, Ganache, or cloud dependencies. It uses local sample files, local mock mappings, mock external processing, rehydration, and a local provenance ledger.
