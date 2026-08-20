@@ -110,7 +110,14 @@ It provides the configurable gateway architecture, implementation details, runti
 ---
 
 # Citation
-Citation information will be added following publication of the accompanying paper.
+
+**Paper**
+Ravi Kumar, *A GenAI-Assisted Privacy Gateway for Secure Third-Party Data Processing*, SSRN, 2026.  
+https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7293198
+
+**Reference implementation**
+Ravi, K. (2026). *GenAI Privacy Gateway* (Version 1.0.1) [Computer software]. Zenodo.  
+https://doi.org/10.5281/zenodo.21454148
 
 ---
 
